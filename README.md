@@ -6,8 +6,8 @@ Go client library for [Riemann](https://github.com/riemann/riemann).
 
 Features:
 * Idiomatic concurrency
-* Sending events, state updates, queries.
-* Feature parity with the reference implementation written in Ruby.
+* Sending events, queries.
+* Support tcp and udp client.
 
 This client is a fork of Goryman, a Riemann go client written by Christopher Gilbert. Thanks to him ! The initial Goryman repository (https://github.com/bigdatadev/goryman) has been deleted. We used @rikatz fork (https://github.com/rikatz/goryman/) to create this repository.
 
@@ -37,11 +37,20 @@ import (
 )
 ```
 
-Next we'll need to establish a new client:
+Next we'll need to establish a new client using Connect. The parameter is the connection timeout duration. You can use a TCP client:
 
 ```go
-c := riemanngo.NewGorymanClient("localhost:5555")
-err := c.Connect()
+c := riemanngo.NewTcpClient("127.0.0.1:5555")
+err := c.Connect(5)
+if err != nil {
+    panic(err)
+}
+```
+
+Or a UDP client:
+```go
+c := riemanngo.NewUdpClient("127.0.0.1:5555")
+err := c.Connect(5)
 if err != nil {
     panic(err)
 }
@@ -53,31 +62,57 @@ Don't forget to close the client connection when you're done:
 defer c.Close()
 ```
 
-Just like the Riemann Ruby client, the client sends small events over UDP by default. TCP is used for queries, and large events. There is no acknowledgement of UDP packets, but they are roughly an order of magnitude faster than TCP. We assume both TCP and UDP are listening on the same port.
-
 Sending events is easy ([list of valid event properties](http://riemann.io/concepts.html)):
 
 ```go
-err = c.SendEvent(&riemanngo.Event{
-    Service: "moargore",
-    Metric:  100,
-    Tags: []string{"nonblocking"},
-})
-if err != nil {
-    panic(err)
-}
+result, err := riemanngo.SendEvent(c, &riemanngo.Event{
+		Service: "hello",
+		Metric:  100,
+		Tags: []string{"riemann ftw"},
+	})
 ```
+The Hostname and Time in events will automatically be replaced with the hostname of the server and the current time if none is specified.
 
-You can also query events:
+You can also send batch of events:
 
 ```go
-events, err := c.QueryEvents("host = \"goryman\"")
+events = []riemanngo.Event {
+    riemanngo.Event{
+        Service: "hello",
+        Metric:  100,
+        Tags: []string{"hello"},
+    },
+riemanngo.Event{
+        Service: "goodbye",
+        Metric:  200,
+        Tags: []string{"goodbye"},
+    },
+}
+```
+
+You can also query the Riemann index (using the TCP client):
+
+```go
+events, err := QueryEvents(c, "service = \"hello\"")
 if err != nil {
     panic(err)
 }
 ```
 
-The Hostname and Time in events will automatically be replaced with the hostname of the server and the current time if none is specified.
+
+## Tests
+
+You can lauch Unit tests using
+
+```go
+go test -run Unit
+```
+
+and Integration tests using:
+
+```go
+go test -run Integ
+```
 
 ## Copyright
 

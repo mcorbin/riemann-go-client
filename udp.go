@@ -29,8 +29,8 @@ func NewUdpClient(addr string) *UdpClient {
 	return t
 }
 
-func (c *UdpClient) Connect() error {
-	udp, err := net.DialTimeout("udp", c.addr, time.Second*5)
+func (c *UdpClient) Connect(timeout int32) error {
+	udp, err := net.DialTimeout("udp", c.addr, time.Second*time.Duration(timeout))
 	if err != nil {
 		return err
 	}

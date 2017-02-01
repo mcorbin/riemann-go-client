@@ -10,7 +10,7 @@ import (
 // Client is an interface to a generic client
 type Client interface {
 	Send(message *proto.Msg) (*proto.Msg, error)
-	Connect() error
+	Connect(timeout int32) error
 	Close() error
 }
 
@@ -26,7 +26,7 @@ type response struct {
 	err     error
 }
 
-// Send an event
+// Send an event using a client
 func SendEvent(c Client, e *Event) (*proto.Msg, error) {
 	epb, err := EventToProtocolBuffer(e)
 	if err != nil {
@@ -34,6 +34,23 @@ func SendEvent(c Client, e *Event) (*proto.Msg, error) {
 	}
 	message := &proto.Msg{}
 	message.Events = append(message.Events, epb)
+
+	msg, err := c.Send(message)
+	return msg, err
+}
+
+// Send multiple events using a client
+func SendEvents(c Client, e *[]Event) (*proto.Msg, error) {
+	var events []*proto.Event
+	for _,elem := range *e {
+		epb, err := EventToProtocolBuffer(&elem)
+		if err != nil {
+			return nil, err
+		}
+		events = append(events, epb)
+	}
+	message := &proto.Msg{}
+	message.Events = events
 
 	msg, err := c.Send(message)
 	return msg, err

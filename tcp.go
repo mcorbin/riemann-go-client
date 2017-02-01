@@ -3,7 +3,6 @@ package riemanngo
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"io"
 	"net"
 	"time"
@@ -30,9 +29,9 @@ func NewTcpClient(addr string) *TcpClient {
 	return t
 }
 
-
-func (c *TcpClient) Connect() error {
-	tcp, err := net.DialTimeout("tcp", c.addr, time.Second*5)
+// connect the TcpClient
+func (c *TcpClient) Connect(timeout int32) error {
+	tcp, err := net.DialTimeout("tcp", c.addr, time.Second*time.Duration(timeout))
 	if err != nil {
 		return err
 	}
@@ -82,9 +81,11 @@ func (t *TcpClient) execRequest(message *proto.Msg) (*proto.Msg, error) {
 	if err = binary.Write(b, binary.BigEndian, uint32(len(data))); err != nil {
 		return msg, err
 	}
+	// send the msg length
 	if _, err = t.conn.Write(b.Bytes()); err != nil {
 		return msg, err
 	}
+	// send the msg
 	if _, err = t.conn.Write(data); err != nil {
 		return msg, err
 	}
@@ -98,9 +99,6 @@ func (t *TcpClient) execRequest(message *proto.Msg) (*proto.Msg, error) {
 	}
 	if err = pb.Unmarshal(response, msg); err != nil {
 		return msg, err
-	}
-	if msg.GetOk() != true {
-		return msg, errors.New(msg.GetError())
 	}
 	return msg, nil
 }
@@ -117,8 +115,8 @@ func readMessages(r io.Reader, p []byte) error {
 	return nil
 }
 
-// Query the server for events
-func QueryIndex(c TcpClient, q string) ([]Event, error) {
+// Query the server for events using the client
+func QueryIndex(c *TcpClient, q string) ([]Event, error) {
 	query := &proto.Query{}
 	query.String_ = pb.String(q)
 
