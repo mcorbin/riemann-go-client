@@ -114,6 +114,23 @@ and Integration tests using:
 go test -run Integ
 ```
 
+I use this Riemann configuration for integration tests:
+
+```clojure
+(logging/init {:file "/var/log/riemann/riemann.log"})
+
+(let [host "0.0.0.0"]
+  (tcp-server)
+  (udp-server))
+
+(periodically-expire 60)
+
+(streams
+ (where (not (service #"^riemann "))
+   (index)
+   #(info %)))
+```
+
 ## Copyright
 
 See [LICENSE](LICENSE) document

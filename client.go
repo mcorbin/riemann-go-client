@@ -42,7 +42,7 @@ func SendEvent(c Client, e *Event) (*proto.Msg, error) {
 // Send multiple events using a client
 func SendEvents(c Client, e *[]Event) (*proto.Msg, error) {
 	var events []*proto.Event
-	for _,elem := range *e {
+	for _, elem := range *e {
 		epb, err := EventToProtocolBuffer(&elem)
 		if err != nil {
 			return nil, err

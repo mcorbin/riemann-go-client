@@ -10,7 +10,7 @@ import (
 )
 
 // UdpClient is a type that implements the Client interface
-type UdpClient  struct {
+type UdpClient struct {
 	addr         string
 	conn         net.Conn
 	requestQueue chan request
@@ -22,7 +22,7 @@ const MAX_UDP_SIZE = 16384
 // NewUdpClient - Factory
 func NewUdpClient(addr string) *UdpClient {
 	t := &UdpClient{
-		addr: addr,
+		addr:         addr,
 		requestQueue: make(chan request),
 	}
 	go t.runRequestQueue()
@@ -81,5 +81,3 @@ func (t *UdpClient) execRequest(message *proto.Msg) (*proto.Msg, error) {
 	}
 	return nil, nil
 }
-
-

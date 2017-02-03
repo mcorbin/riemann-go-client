@@ -5,7 +5,7 @@ import (
 )
 
 func TestUnitNewTcpClient(t *testing.T) {
-	client := NewTcpClient("127.0.0.1:5555");
+	client := NewTcpClient("127.0.0.1:5555")
 	if client.addr != "127.0.0.1:5555" {
 		t.Error("Error creating a new tcp client")
 	}
@@ -26,7 +26,7 @@ func TestUnitNewTcpClient(t *testing.T) {
 //    #(info %)))
 
 func TestIntegSendEventTcp(t *testing.T) {
-	c := NewTcpClient("127.0.0.1:5555");
+	c := NewTcpClient("127.0.0.1:5555")
 	err := c.Connect(5)
 	defer c.Close()
 	if err != nil {
@@ -35,62 +35,61 @@ func TestIntegSendEventTcp(t *testing.T) {
 	result, err := SendEvent(c, &Event{
 		Service: "LOOOl",
 		Metric:  100,
-		Tags: []string{"nonblocking"},
+		Tags:    []string{"nonblocking"},
 	})
-	if ! *result.Ok {
+	if !*result.Ok {
 		t.Error("Error Tcp client SendEvent")
 	}
 }
 
 func TestIntegSendEventsTcp(t *testing.T) {
-	c := NewTcpClient("127.0.0.1:5555");
+	c := NewTcpClient("127.0.0.1:5555")
 	err := c.Connect(5)
 	defer c.Close()
 	if err != nil {
 		t.Error("Error Tcp client Connect")
 	}
-	events := []Event {
+	events := []Event{
 		Event{
 			Service: "hello",
 			Metric:  100,
-			Tags: []string{"hello"},
+			Tags:    []string{"hello"},
 		},
 		Event{
 			Service: "goodbye",
 			Metric:  200,
-			Tags: []string{"goodbye"},
+			Tags:    []string{"goodbye"},
 		},
 	}
 	result, err := SendEvents(c, &events)
-	if ! *result.Ok {
+	if !*result.Ok {
 		t.Error("Error Tcp client SendEvent")
 	}
 }
 
-
 func TestIntegQueryIndex(t *testing.T) {
-	c := NewTcpClient("127.0.0.1:5555");
+	c := NewTcpClient("127.0.0.1:5555")
 	err := c.Connect(5)
 	defer c.Close()
 	if err != nil {
 		t.Error("Error Tcp client Connect")
 	}
-	events := []Event {
+	events := []Event{
 		Event{
-			Host: "foobaz",
+			Host:    "foobaz",
 			Service: "golang",
 			Metric:  100,
-			Tags: []string{"hello"},
+			Tags:    []string{"hello"},
 		},
 		Event{
-			Host: "foobar",
+			Host:    "foobar",
 			Service: "golang",
 			Metric:  200,
-			Tags: []string{"goodbye"},
+			Tags:    []string{"goodbye"},
 		},
 	}
 	result, err := SendEvents(c, &events)
-	if ! *result.Ok {
+	if !*result.Ok {
 		t.Error("Error Tcp client SendEvent")
 	}
 	queryResult, err := QueryIndex(c, "(service = \"golang\")")
@@ -100,7 +99,7 @@ func TestIntegQueryIndex(t *testing.T) {
 }
 
 func TestIntegTcpConnec(t *testing.T) {
-	c := NewTcpClient("does.not.exists:8888");
+	c := NewTcpClient("does.not.exists:8888")
 	// should produce an error
 	err := c.Connect(2)
 	if err == nil {

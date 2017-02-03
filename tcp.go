@@ -18,11 +18,10 @@ type TcpClient struct {
 	requestQueue chan request
 }
 
-
 // NewTcpClient - Factory
 func NewTcpClient(addr string) *TcpClient {
 	t := &TcpClient{
-		addr: addr,
+		addr:         addr,
 		requestQueue: make(chan request),
 	}
 	go t.runRequestQueue()
@@ -38,7 +37,6 @@ func (c *TcpClient) Connect(timeout int32) error {
 	c.conn = tcp
 	return nil
 }
-
 
 // TcpClient implementation of Send, queues a request to send a message to the server
 func (t *TcpClient) Send(message *proto.Msg) (*proto.Msg, error) {

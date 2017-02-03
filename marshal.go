@@ -36,7 +36,7 @@ func EventToProtocolBuffer(event *Event) (*proto.Event, error) {
 	var attrs []*proto.Attribute
 	for key, value := range event.Attributes {
 		attrs = append(attrs, &proto.Attribute{
-			Key: pb.String(key),
+			Key:   pb.String(key),
 			Value: pb.String(value),
 		})
 	}
@@ -58,7 +58,6 @@ func EventToProtocolBuffer(event *Event) (*proto.Event, error) {
 	}
 	return &e, nil
 }
-
 
 // converts an array of proto.Event to an array of Event
 func ProtocolBuffersToEvents(pbEvents []*proto.Event) []Event {
